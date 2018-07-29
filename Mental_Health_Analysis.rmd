@@ -1,0 +1,231 @@
+---
+title: "Mental Health Analysis"
+author: "Niket Choudhary"
+date: "July 28, 2018"
+output: rmarkdown::github_document
+---
+
+```{r}
+mhealth <- read.csv(file.choose(), header = TRUE, na.strings = c("NA", "", " ", "."))
+```
+
+```{r}
+summary(mhealth)
+```
+
+```{r}
+str(mhealth)
+```
+
+At first glance the data requires a good amount of cleaning. Let's take it step by step.
+
+***
+
+First we can see that the Timestamp is nearly unique with about 10 repetations, but it desn't matter. Data is arranged over date. We can consider it to be unique person. Also let's look at the span
+```{r}
+head(mhealth$Timestamp, 2)
+tail(mhealth$Timestamp, 2)
+```
+This data is from 2014-08-27 to 2016-02-01, around 15 months. The timespan does not matter for our Data Analysis.
+
+***
+
+Let's see the missing data in every column
+```{r}
+sapply(mhealth, function(x) sum(is.na(x)))
+```
+We could drop work_interfere, but I wan't to perform my analysis and prediction around this variable.
+
+Also, consider only rows with work_interfere data
+```{r}
+mhealth_1 <- mhealth[!is.na(mhealth$work_interfere),]
+```
+
+Well, we should drop Comments and State column. 
+```{r}
+mhealth_1$comments <- NULL
+mhealth_1$state <- NULL
+```
+
+Let's look at self_employed
+```{r}
+summary(mhealth_1$self_employed)
+```
+Well, we can fill the missing values with No
+```{r}
+mhealth_1$self_employed[is.na(mhealth_1$self_employed)] <- 'No'
+```
+
+
+```{r}
+sapply(mhealth_1, function(x) sum(is.na(x)))
+```
+
+So, we are done dealing with missing values
+
+***
+
+Let's look at Age 
+```{r}
+summary(as.factor(mhealth_1$Age))
+```
+First two, and last do data are incorrect, let's replace them with modearte values
+```{r}
+mhealth_1$Age[which(mhealth_1$Age < 0)] <- 19 # 19 and 56 have maximum people in that limited group
+mhealth_1$Age[which(mhealth_1$Age > 100)] <- 56 
+```
+
+```{r}
+summary(mhealth_1$Age)
+```
+
+***
+
+Looking at Gender
+```{r}
+summary(mhealth_1$Gender)
+```
+This is too bad data column!! Let's clean this
+```{r}
+male <- c("cis male", "Cis Male", "Cis Man", "m", "M", "Mail", "maile", "Make", "Mal", "male", "Male", "Male-ish", "Male ", "Male (CIS)", "Malr", "Man", "msle")
+
+trans <- c("Agender", "All", "Androgyne", "Enby", "Female (trans)", "fluid", "Genderqueer", "male leaning androgynous", "Nah", "Neuter", "non-binary", "ostensibly male, unsure what that really means", "queer", "queer/she/they", "something kinda male?", "Trans-female", "Trans woman")
+
+female <- c("cis-female/femme", "Cis Female", "f", "F", "femail",  "Femake", "female", "Female", "Female ", "Female (cis)", "woman", "Woman")
+```
+
+
+```{r}
+mhealth_1$Gender <- sapply(as.character(mhealth_1$Gender), function(x) if(x %in% male) "Male" else x )
+mhealth_1$Gender <- sapply(as.character(mhealth_1$Gender), function(x) if(x %in% female) "Female" else x )
+mhealth_1$Gender <- sapply(as.character(mhealth_1$Gender), function(x) if(x %in% trans) "Trans" else x )
+```
+
+Dropping rest three gender types, as they are impossible to comprehend
+```{r}
+mhealth_1 <- mhealth_1[!mhealth_1$Gender == "p",]
+mhealth_1 <- mhealth_1[!mhealth_1$Gender == "Guy (-ish) ^_^",]
+mhealth_1 <- mhealth_1[!mhealth_1$Gender == "A little about you",]
+```
+
+```{r}
+summary(as.factor(mhealth_1$Gender))
+```
+
+Store this in new data frame
+```{r}
+mhealth_2 <- mhealth_1
+```
+
+download 
+```{r}
+write.csv(mhealth_2, "mhealth_2.csv", row.names=FALSE)
+```
+
+
+***
+
+Now let's analyse our data and find insights
+
+```{r}
+library(ggplot2)
+
+ggplot(mhealth_2, aes(Age)) +
+  geom_density(aes(fill = Gender), alpha=0.2)
+```
+Well, most of them are facing these issues between age of 20 to 45, which is the working age
+
+```{r}
+x <- aggregate(Timestamp ~ Country + as.factor(Gender) , data = mhealth_2, length)
+x <- x[with(x,order(-Timestamp)),]
+x <- x[1:15,]
+```
+
+
+Look at the data of countries with most respondents
+```{r}
+ggplot(x, aes(x = Country, y = Timestamp)) + 
+  geom_bar(aes(fill = x$`as.factor(Gender)`), stat = "identity") +
+  xlab("Country") + ylab("Number of respondents") + labs(title = "Number of Respondents per Country", fill="Gender") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+Most of our data is from USA and UK
+
+How many had a family history of mental illness
+```{r}
+ggplot(mhealth, aes(family_history)) +
+  geom_bar(fill = c("#EC7063", "#5DADE2"))
+```
+Most of them did not have, but a significant amount of them had a history of mental illness
+
+Let's look at People who do remote work and have work interfere and take a treatment
+```{r}
+y <- aggregate(Timestamp ~ remote_work + work_interfere + treatment, data = mhealth_2, length)
+y <- y[y$remote_work == "Yes",]
+```
+
+```{r}
+ggplot(y, aes(x = work_interfere, y = Timestamp)) + 
+  geom_bar(aes(fill = treatment), stat = "identity") +
+  xlab("Work Interfere") + ylab("Number of respondents") + labs(title = "Number of Respondents working from Home vs Work Interference", fill="Treatment") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+The scale of treatment is propotional to severity of Work Interference
+
+
+Let's look at People who do work for technical company and have work interfere and take a treatment
+```{r}
+z <- aggregate(Timestamp ~ tech_company + work_interfere + treatment, data = mhealth_2, length)
+z <- z[z$tech_company == "Yes",]
+```
+
+```{r}
+ggplot(z, aes(x = work_interfere, y = Timestamp)) + 
+  geom_bar(aes(fill = treatment), stat = "identity") +
+  xlab("Work Interfere") + ylab("Number of respondents") + labs(title = "Number of Respondents working at Tech Company vs Work Interference", fill="Treatment") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+The scale of treatment is propotional to severity of Work Interference
+
+Let's look at company size and how many have work interfere and take a treatment
+```{r}
+w <- aggregate(Timestamp ~ no_employees + work_interfere + treatment, data = mhealth_2, length)
+w <- w[w$treatment == "Yes",]
+```
+
+```{r}
+ggplot(w, aes(x = no_employees, y = Timestamp)) + 
+  geom_bar(aes(fill = work_interfere), stat = "identity") +
+  xlab("Work Interfere") + ylab("Number of respondents") + labs(title = "Number of treatment seeking Respondents vs their company size", fill="work_interfere") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+Most of our respondents are having work intreference, and the size of the company doesn' seem to be much affecting their condition
+
+***
+
+```{r}
+mhealth_2$Timestamp <- NULL # drop this
+```
+
+
+Let's build prediction models. To quantify the burden of mental illness I will consider Work_interfere column as my dependent variable. I will scale it.
+```{r}
+levels(mhealth_2$work_interfere)[levels(mhealth_2$work_interfere) == "Never"] <- '0'
+levels(mhealth_2$work_interfere)[levels(mhealth_2$work_interfere) == "Rarely"] <- '1'
+levels(mhealth_2$work_interfere)[levels(mhealth_2$work_interfere) == "Sometimes"] <- '2'
+levels(mhealth_2$work_interfere)[levels(mhealth_2$work_interfere) == "Often"] <- '3'
+```
+
+```{r}
+mhealth_2$Gender <- as.factor(mhealth_2$Gender)
+```
+
+```{r}
+write.csv(mhealth_2, "mhealth_2.csv", row.names = F)
+```
+
+
+***
+
+
+
