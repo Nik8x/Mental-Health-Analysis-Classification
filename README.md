@@ -1,5 +1,7 @@
 # Mental Health in Tech: Predicting Work Interference
 
+**Live report:** https://nik8x.github.io/Mental-Health-Analysis-Classification/
+
 The OSMI 2014 "Mental Health in Tech" survey, 992 respondents after
 cleaning, predicting how often mental health interferes with work
 (`work_interfere`: Never, Rarely, Sometimes, Often). Source data:
