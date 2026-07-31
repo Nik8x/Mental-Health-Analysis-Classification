@@ -1,0 +1,11 @@
+{
+  "n_respondents": 992,
+  "n_invalid_ages_fixed": 6,
+  "work_interfere_distribution": {
+    "Sometimes": 0.46774193548387094,
+    "Never": 0.21471774193548387,
+    "Rarely": 0.1743951612903226,
+    "Often": 0.1431451612903226
+  },
+  "top_country": "United States"
+}

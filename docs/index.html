@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mental Health in Tech: Predicting Work Interference</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg:            #fcfcfb;
+  --surface:       #ffffff;
+  --surface-2:     #f4f3f0;
+  --border:        #e4e2dc;
+  --text-primary:  #14140f;
+  --text-secondary:#52514e;
+  --text-muted:    #7a7972;
+  --series-1:      #2a78d6;
+  --series-2:      #eb6834;
+  --series-3:      #1baf7a;
+  --series-4:      #eda100;
+  --good:          #0ca30c;
+  --critical:      #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg:            #131311;
+    --surface:       #1a1a19;
+    --surface-2:     #212120;
+    --border:        #34332f;
+    --text-primary:  #f5f4f0;
+    --text-secondary:#c3c2b7;
+    --text-muted:    #8f8e86;
+    --series-1:      #3987e5;
+    --series-2:      #d95926;
+    --series-3:      #199e70;
+    --series-4:      #c98500;
+    --good:          #3ecf3e;
+    --critical:      #e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:            #131311;
+  --surface:       #1a1a19;
+  --surface-2:     #212120;
+  --border:        #34332f;
+  --text-primary:  #f5f4f0;
+  --text-secondary:#c3c2b7;
+  --text-muted:    #8f8e86;
+  --series-1:      #3987e5;
+  --series-2:      #d95926;
+  --series-3:      #199e70;
+  --series-4:      #c98500;
+  --good:          #3ecf3e;
+  --critical:      #e66767;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.55;
+}
+main { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+header.hero { margin-bottom: 2.5rem; }
+h1 { font-size: 1.9rem; margin: 0 0 0.5rem; letter-spacing: -0.01em; }
+.lede { color: var(--text-secondary); font-size: 1.05rem; max-width: 68ch; }
+.pill-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+.pill {
+  font-size: 0.78rem; color: var(--text-secondary); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 999px; padding: 0.25rem 0.7rem;
+}
+section { margin: 3rem 0; }
+h2 { font-size: 1.3rem; margin: 0 0 0.3rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+p { color: var(--text-secondary); }
+p.section-intro { margin-top: 0.8rem; }
+figure { margin: 1.2rem 0; }
+figure img { max-width: 100%; display: block; border-radius: 8px; border: 1px solid var(--border); }
+figcaption { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+.stat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; margin-top: 1.2rem;
+}
+.stat { background: var(--surface); padding: 1rem; }
+.stat .num { font-size: 1.5rem; font-weight: 600; }
+.stat .label { font-size: 0.78rem; color: var(--text-muted); }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; margin: 1rem 0; }
+th, td { text-align: left; padding: 0.45rem 0.7rem; border-bottom: 1px solid var(--border); }
+th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.02em; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+code { background: var(--surface-2); border-radius: 4px; padding: 0.1rem 0.35rem; font-size: 0.9em; }
+.callout {
+  background: var(--surface-2); border-left: 3px solid var(--series-1);
+  border-radius: 6px; padding: 0.9rem 1.1rem; font-size: 0.92rem;
+  color: var(--text-secondary); margin: 1.2rem 0;
+}
+.callout.warn { border-left-color: var(--series-2); }
+ul.findings { padding-left: 1.2rem; }
+ul.findings li { margin-bottom: 0.8rem; color: var(--text-secondary); }
+ul.findings strong { color: var(--text-primary); }
+footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); }
+a { color: var(--series-1); }
+</style>
+</head>
+<body>
+<main>
+
+<header class="hero">
+  <h1>Mental Health in Tech: Predicting Work Interference</h1>
+  <p class="lede">
+    The OSMI 2014 "Mental Health in Tech" survey, 992 respondents after
+    cleaning. The original project was 4 separate R Markdown files
+    (cleaning/EDA, a productivity calculation, and three modeling
+    notebooks ending in RF/GBM/XGBoost and an H2O AutoML run), all
+    landing at "nearly 50% accurate" with no baseline to compare
+    against. Ported to Python, same structure, real bugs fixed.
+  </p>
+  <div class="pill-row">
+    <span class="pill">992 respondents</span>
+    <span class="pill">4-class ordinal target</span>
+    <span class="pill">random forest / gradient boosting / XGBoost</span>
+    <span class="pill">chi-square testing</span>
+    <span class="pill">culture-based clustering</span>
+  </div>
+</header>
+
+<section id="eda">
+  <h2>The data</h2>
+  <figure>
+    <img src="assets/age_by_gender.png" alt="Age density by gender">
+  </figure>
+  <figure>
+    <img src="assets/target_distribution.png" alt="Bar chart of work_interfere class distribution">
+    <figcaption>The target: how often mental health interferes with work. "Sometimes" alone is 46.8% of respondents, the baseline every model has to beat.</figcaption>
+  </figure>
+  <figure>
+    <img src="assets/top_countries.png" alt="Bar chart of top 10 countries by respondent count">
+  </figure>
+</section>
+
+<section id="testing">
+  <h2>Two of the original's visual reads don't hold up</h2>
+  <p class="section-intro">
+    The original notebook describes two grouped bar charts as showing
+    "the scale of treatment is proportional to severity of work
+    interference", once for remote workers, once for tech company
+    employees. Chi-square tests say otherwise.
+  </p>
+  <table>
+    <thead><tr><th>Factor</th><th class="num">chi2</th><th class="num">p-value</th><th>Significant?</th></tr></thead>
+    <tbody>
+      <tr><td>remote_work</td><td class="num">2.92</td><td class="num">0.404</td><td>No</td></tr>
+      <tr><td>tech_company</td><td class="num">3.30</td><td class="num">0.347</td><td>No</td></tr>
+      <tr><td>no_employees</td><td class="num">23.19</td><td class="num">0.080</td><td>No</td></tr>
+      <tr><td>Gender</td><td class="num">18.59</td><td class="num">0.005</td><td>Yes</td></tr>
+      <tr><td>family_history</td><td class="num">83.46</td><td class="num">&lt;0.0001</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    Neither remote_work nor tech_company actually associate with
+    work_interfere once tested formally, despite both being described in
+    the original as showing a real relationship. Company size comes
+    close but doesn't clear the conventional 0.05 threshold either.
+    Family history and gender are the two that hold up.
+  </div>
+  <p>Family history and treatment-seeking specifically: 49.3% of
+    respondents without a family history seek treatment, versus 80.9%
+    of those with one (chi2 = 104.91, p &lt; 0.0001).</p>
+</section>
+
+<section id="mi-bug">
+  <h2>A subtle mutual-information bug, caught and fixed</h2>
+  <p class="section-intro">
+    Computing mutual information the naive way (scikit-learn's default,
+    which treats every column as continuous) put a single feature,
+    <code>CountryGroup_Poland</code>, at the very top of the ranking. It
+    turned out to have exactly 7 respondents in the whole dataset,
+    the k-nearest-neighbors estimator behind the default is known to be
+    unstable on very sparse binary columns. Every feature here actually
+    is a binary 0/1 dummy (or genuinely numeric, only Age), so passing
+    <code>discrete_features=True</code> fixed it.
+  </p>
+  <div class="stat-grid">
+    <div class="stat"><div class="num">CountryGroup_Poland</div><div class="label">top MI feature (wrong, default estimator)</div></div>
+    <div class="stat"><div class="num">Age</div><div class="label">top MI feature (correct, discrete estimator)</div></div>
+  </div>
+</section>
+
+<section id="model">
+  <h2>Modeling: fixing "nearly 50% accurate" with an actual baseline</h2>
+  <p class="section-intro">
+    One of the original's modeling notebooks configured XGBoost with
+    <code>num_class = 20</code>, despite `work_interfere` only having 4
+    levels, fixed here. More importantly, the original never computed a
+    majority-class baseline to check whether "nearly 50% accurate" (its
+    own summary across all 3 models) was actually meaningful.
+  </p>
+  <table>
+    <thead><tr><th>Model</th><th class="num">Accuracy</th><th class="num">Macro-F1</th></tr></thead>
+    <tbody>
+      <tr><td>Baseline (always predict "Sometimes")</td><td class="num">46.7%</td><td class="num">0.000</td></tr>
+      <tr><td>Random forest (balanced class weights)</td><td class="num">36.2%</td><td class="num">0.325</td></tr>
+      <tr><td>Gradient boosting</td><td class="num">47.7%</td><td class="num">0.320</td></tr>
+      <tr><td>XGBoost</td><td class="num">42.7%</td><td class="num">0.285</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    Gradient boosting barely edges past baseline (47.7% vs 46.7%),
+    XGBoost and random forest both fall below it on raw accuracy. Fixing
+    the real bugs did not rescue this into a strong classifier, it
+    confirmed the original's "nearly 50% accurate" was close to a coin
+    flip all along. Macro-F1 tells a more nuanced story: random forest's
+    0.325 (versus 0.000 for a baseline that gets zero credit on 3 of 4
+    classes) shows real, balanced signal that raw accuracy hides, it
+    just isn't enough to win on overall correctness.
+  </div>
+  <figure>
+    <img src="assets/model_comparison.png" alt="Bar chart comparing accuracy and macro-F1 across models">
+  </figure>
+  <figure>
+    <img src="assets/feature_importance.png" alt="Random forest feature importance">
+  </figure>
+</section>
+
+<section id="clustering">
+  <h2>Clustering by workplace culture</h2>
+  <p class="section-intro">
+    Grouping respondents purely by how they described their workplace's
+    mental health culture (benefits, care options, leave difficulty,
+    whether coworkers/supervisors feel safe to talk to), no
+    work_interfere or treatment label involved, checked against real
+    rates afterward.
+  </p>
+  <div class="stat-grid">
+    <div class="stat"><div class="num">55.1% to 76.6%</div><div class="label">treatment rate across the 4 clusters</div></div>
+    <div class="stat"><div class="num">55.6% to 68.0%</div><div class="label">high-interference rate across the 4 clusters</div></div>
+  </div>
+  <figure>
+    <img src="assets/cluster_rates.png" alt="Bar chart of treatment and high-interference rate by cluster">
+  </figure>
+  <figure>
+    <img src="assets/cluster_pca.png" alt="PCA scatter of respondents colored by culture cluster">
+  </figure>
+  <p>
+    A workplace's described culture predicts treatment-seeking somewhat
+    better (a real 21-point spread) than it predicts work interference
+    specifically (a smaller 12-point spread), consistent with how modest
+    the supervised models' performance on `work_interfere` turned out to
+    be.
+  </p>
+</section>
+
+<section id="findings">
+  <h2>Key findings</h2>
+  <ul class="findings">
+    <li><strong>Two of the original's "the chart shows a relationship"
+      claims don't survive a formal test.</strong> remote_work
+      (p = 0.404) and tech_company (p = 0.347) show no real association
+      with work_interfere.</li>
+    <li><strong>A sparse one-hot column (7 respondents) broke the naive
+      mutual information ranking</strong>, fixed by telling the
+      estimator its inputs are discrete, not continuous.</li>
+    <li><strong>"Nearly 50% accurate" turned out to mean "close to the
+      majority-class baseline."</strong> Gradient boosting barely beats
+      it, random forest and XGBoost fall below it on raw accuracy, even
+      after fixing the original's `num_class = 20` bug.</li>
+    <li><strong>Family history remains the strongest, most reliable
+      signal</strong> in every test used here, chi-square, mutual
+      information, and random forest importance all agree on it.</li>
+    <li><strong>Workplace culture clustering predicts treatment-seeking
+      better than work interference</strong>, a 21-point spread versus a
+      12-point spread across the same 4 clusters.</li>
+  </ul>
+</section>
+
+<section id="future">
+  <h2>Future work</h2>
+  <ul class="findings">
+    <li>Try modeling `treatment` (binary, better balanced) as a second,
+      easier target for direct comparison against the 4-class
+      `work_interfere` result.</li>
+    <li>Bring in a proper ordinal classification approach (ordinal
+      logistic regression, or an ordinal loss function) rather than
+      treating the 4 work-interference levels as unordered classes.</li>
+    <li>Revisit the original's productivity-loss calculation and H2O
+      AutoML notebooks, not reproduced here, as their own dedicated
+      follow-ups.</li>
+  </ul>
+</section>
+
+<footer>
+  Full detail, code, and every number above in the
+  <a href="https://github.com/Nik8x/Mental-Health-Analysis-Classification">notebooks</a>.
+</footer>
+
+</main>
+</body>
+</html>

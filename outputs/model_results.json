@@ -1,0 +1,22 @@
+{
+  "baseline_accuracy": 0.46733668341708545,
+  "results": {
+    "random forest": {
+      "accuracy": 0.36180904522613067,
+      "macro_f1": 0.3253915920962874
+    },
+    "gradient boosting": {
+      "accuracy": 0.47738693467336685,
+      "macro_f1": 0.32017925836855055
+    },
+    "xgboost": {
+      "accuracy": 0.4271356783919598,
+      "macro_f1": 0.28482856132909157
+    },
+    "baseline (always predict Sometimes)": {
+      "accuracy": 0.46733668341708545,
+      "macro_f1": 0.0
+    }
+  },
+  "top_rf_feature": "Age"
+}
