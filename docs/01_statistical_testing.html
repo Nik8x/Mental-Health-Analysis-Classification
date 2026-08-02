@@ -7802,10 +7802,10 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Statistical-testing">Statistical testing<a class="anchor-link" href="#Statistical-testing">¶</a></h1><p>The original notebook reads several grouped bar charts as showing real
-relationships ("the scale of treatment is proportional to severity of
-work interference" for both remote workers and tech company employees).
-Real chi-square tests check whether that's actually true.</p>
+<h1 id="Statistical-testing">Statistical testing<a class="anchor-link" href="#Statistical-testing">¶</a></h1><p>Several grouped bar charts in the EDA look like they show real
+relationships, treatment scaling with severity of work interference,
+for both remote workers and tech company employees. Chi-square tests
+check whether that's actually true.</p>
 </div>
 </div>
 </div>
@@ -7884,14 +7884,14 @@ Gender          vs work_interfere: chi2 =   18.59, p = 0.0049
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>This overturns two of the original's visual reads. <code>remote_work</code>
+<p>Two of the visual reads don't survive formal testing. <code>remote_work</code>
 (p = 0.404) and <code>tech_company</code> (p = 0.347) show <strong>no</strong> significant
-association with <code>work_interfere</code> once tested formally, despite the
-original describing both bar charts as showing a proportional
-relationship. <code>no_employees</code> (company size) sits at p = 0.080, not
-significant at the conventional 0.05 cutoff either, a weaker signal
-than the chart alone might suggest. <code>family_history</code> (p &lt; 0.0001) and
-<code>Gender</code> (p = 0.005) are the two factors that actually hold up.</p>
+association with <code>work_interfere</code>, despite both bar charts looking like
+a proportional relationship. <code>no_employees</code> (company size) sits at
+p = 0.080, not significant at the conventional 0.05 cutoff either, a
+weaker signal than the chart alone might suggest. <code>family_history</code>
+(p &lt; 0.0001) and <code>Gender</code> (p = 0.005) are the two factors that actually
+hold up.</p>
 </div>
 </div>
 </div>
@@ -7978,7 +7978,7 @@ than the chart alone might suggest. <code>family_history</code> (p &lt; 0.0001) 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Having a family history of mental illness is very strongly associated with seeking treatment, respondents with a family history seek treatment at a much higher rate. This one holds up clearly, both visually in the original and formally here.</p>
+<p>Having a family history of mental illness is very strongly associated with seeking treatment, respondents with a family history seek treatment at a much higher rate. This one holds up clearly, both visually and formally.</p>
 </div>
 </div>
 </div>

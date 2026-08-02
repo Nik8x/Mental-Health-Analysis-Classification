@@ -113,11 +113,10 @@ a { color: var(--series-1); }
   <h1>Mental Health in Tech: Predicting Work Interference</h1>
   <p class="lede">
     The OSMI 2014 "Mental Health in Tech" survey, 992 respondents after
-    cleaning. The original project was 4 separate R Markdown files
-    (cleaning/EDA, a productivity calculation, and three modeling
-    notebooks ending in RF/GBM/XGBoost and an H2O AutoML run), all
-    landing at "nearly 50% accurate" with no baseline to compare
-    against. Ported to Python, same structure, real bugs fixed.
+    cleaning. Cleaning and EDA, statistical testing, feature
+    engineering, and modeling with random forest, gradient boosting,
+    and XGBoost, checked against an actual majority-class baseline so
+    "nearly 50% accurate" means something.
   </p>
   <div class="pill-row">
     <span class="pill">992 respondents</span>
@@ -143,12 +142,12 @@ a { color: var(--series-1); }
 </section>
 
 <section id="testing">
-  <h2>Two of the original's visual reads don't hold up</h2>
+  <h2>Testing the EDA charts formally</h2>
   <p class="section-intro">
-    The original notebook describes two grouped bar charts as showing
-    "the scale of treatment is proportional to severity of work
-    interference", once for remote workers, once for tech company
-    employees. Chi-square tests say otherwise.
+    Grouped bar charts of treatment rate by remote-work status and by
+    tech-company status both look like they show treatment scaling with
+    severity of work interference. Chi-square tests check whether that
+    visual read holds up.
   </p>
   <table>
     <thead><tr><th>Factor</th><th class="num">chi2</th><th class="num">p-value</th><th>Significant?</th></tr></thead>
@@ -162,10 +161,10 @@ a { color: var(--series-1); }
   </table>
   <div class="callout warn">
     Neither remote_work nor tech_company actually associate with
-    work_interfere once tested formally, despite both being described in
-    the original as showing a real relationship. Company size comes
-    close but doesn't clear the conventional 0.05 threshold either.
-    Family history and gender are the two that hold up.
+    work_interfere once tested formally, despite both looking like a
+    real relationship in the charts. Company size comes close but
+    doesn't clear the conventional 0.05 threshold either. Family
+    history and gender are the two that hold up.
   </div>
   <p>Family history and treatment-seeking specifically: 49.3% of
     respondents without a family history seek treatment, versus 80.9%
@@ -191,13 +190,12 @@ a { color: var(--series-1); }
 </section>
 
 <section id="model">
-  <h2>Modeling: fixing "nearly 50% accurate" with an actual baseline</h2>
+  <h2>Modeling against an actual baseline</h2>
   <p class="section-intro">
-    One of the original's modeling notebooks configured XGBoost with
-    <code>num_class = 20</code>, despite `work_interfere` only having 4
-    levels, fixed here. More importantly, the original never computed a
-    majority-class baseline to check whether "nearly 50% accurate" (its
-    own summary across all 3 models) was actually meaningful.
+    XGBoost is configured with <code>num_class</code> set to match
+    `work_interfere`'s actual 4 levels. The more important step is
+    computing a majority-class baseline, since "nearly 50% accurate"
+    only means something once you know what a naive guess scores.
   </p>
   <table>
     <thead><tr><th>Model</th><th class="num">Accuracy</th><th class="num">Macro-F1</th></tr></thead>
@@ -210,13 +208,12 @@ a { color: var(--series-1); }
   </table>
   <div class="callout warn">
     Gradient boosting barely edges past baseline (47.7% vs 46.7%),
-    XGBoost and random forest both fall below it on raw accuracy. Fixing
-    the real bugs did not rescue this into a strong classifier, it
-    confirmed the original's "nearly 50% accurate" was close to a coin
-    flip all along. Macro-F1 tells a more nuanced story: random forest's
-    0.325 (versus 0.000 for a baseline that gets zero credit on 3 of 4
-    classes) shows real, balanced signal that raw accuracy hides, it
-    just isn't enough to win on overall correctness.
+    XGBoost and random forest both fall below it on raw accuracy.
+    "Nearly 50% accurate" turns out to be close to a coin flip.
+    Macro-F1 tells a more nuanced story: random forest's 0.325 (versus
+    0.000 for a baseline that gets zero credit on 3 of 4 classes) shows
+    real, balanced signal that raw accuracy hides, it just isn't enough
+    to win on overall correctness.
   </div>
   <figure>
     <img src="assets/model_comparison.png" alt="Bar chart comparing accuracy and macro-F1 across models">
@@ -257,17 +254,16 @@ a { color: var(--series-1); }
 <section id="findings">
   <h2>Key findings</h2>
   <ul class="findings">
-    <li><strong>Two of the original's "the chart shows a relationship"
-      claims don't survive a formal test.</strong> remote_work
-      (p = 0.404) and tech_company (p = 0.347) show no real association
-      with work_interfere.</li>
+    <li><strong>Two EDA charts that look like they show a relationship
+      don't survive a formal test.</strong> remote_work (p = 0.404) and
+      tech_company (p = 0.347) show no real association with
+      work_interfere.</li>
     <li><strong>A sparse one-hot column (7 respondents) broke the naive
       mutual information ranking</strong>, fixed by telling the
       estimator its inputs are discrete, not continuous.</li>
     <li><strong>"Nearly 50% accurate" turned out to mean "close to the
       majority-class baseline."</strong> Gradient boosting barely beats
-      it, random forest and XGBoost fall below it on raw accuracy, even
-      after fixing the original's `num_class = 20` bug.</li>
+      it, random forest and XGBoost fall below it on raw accuracy.</li>
     <li><strong>Family history remains the strongest, most reliable
       signal</strong> in every test used here, chi-square, mutual
       information, and random forest importance all agree on it.</li>
@@ -286,9 +282,8 @@ a { color: var(--series-1); }
     <li>Bring in a proper ordinal classification approach (ordinal
       logistic regression, or an ordinal loss function) rather than
       treating the 4 work-interference levels as unordered classes.</li>
-    <li>Revisit the original's productivity-loss calculation and H2O
-      AutoML notebooks, not reproduced here, as their own dedicated
-      follow-ups.</li>
+    <li>A productivity-loss calculation and an H2O AutoML pass are
+      natural next notebooks, not covered here.</li>
   </ul>
 </section>
 

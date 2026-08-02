@@ -7803,14 +7803,11 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="Mental-health-in-tech:-data-setup-and-EDA">Mental health in tech: data setup and EDA<a class="anchor-link" href="#Mental-health-in-tech:-data-setup-and-EDA">¶</a></h1><p>The OSMI 2014 "Mental Health in Tech" survey, 1,259 respondents, 27
-questions about workplace mental health culture. The original project
-was 4 separate R Markdown files (cleaning/EDA, a productivity-loss
-calculation, and three different modeling notebooks culminating in an
-H2O AutoML run), all with 4 different classifiers landing at "nearly
-50% accurate" on a 4-class target with no baseline comparison to say
-whether that's actually good. This rebuild is Python/Jupyter, same
-overall structure, ported to pandas/scikit-learn, keeping the original's
-sensible cleaning decisions and fixing the ones that weren't.</p>
+questions about workplace mental health culture. Cleaning and EDA here,
+statistical testing, feature engineering, and modeling with random
+forest, gradient boosting, and XGBoost in the following notebooks,
+checked against an actual majority-class baseline so "nearly 50%
+accurate" means something.</p>
 </div>
 </div>
 </div>
@@ -7882,7 +7879,7 @@ dtype: int64</pre>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>comments</code> (1,095 missing) and <code>state</code> (515 missing, only meaningful for US respondents anyway) get dropped, matching the original. <code>self_employed</code> (18 missing) gets filled with 'No', the majority class, also matching the original. <code>work_interfere</code> (264 missing) is the target, those rows get dropped rather than imputed, since inventing a work-interference level for someone who never answered the question isn't defensible.</p>
+<p><code>comments</code> (1,095 missing) and <code>state</code> (515 missing, only meaningful for US respondents anyway) get dropped. <code>self_employed</code> (18 missing) gets filled with 'No', the majority class. <code>work_interfere</code> (264 missing) is the target, those rows get dropped rather than imputed, since inventing a work-interference level for someone who never answered the question isn't defensible.</p>
 </div>
 </div>
 </div>
@@ -7998,13 +7995,13 @@ dtype: int64</pre>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Age has a handful of nonsense values (<code>-1726</code>, <code>-29</code>, <code>-1</code>, <code>5</code>, <code>8</code>,
-<code>11</code>, <code>329</code>, <code>99999999999</code>). The original replaced negative ages with 19
-and ages over 100 with 56, its two most common ages, an odd choice with
-no real justification (why should someone who typed a negative number
-actually be 19?). This rebuild instead treats anything outside a
-plausible working-age range (15-100) as missing and imputes with the
-median of the valid respondents, which is a smaller, more defensible
-intervention (only a handful of rows are affected either way).</p>
+<code>11</code>, <code>329</code>, <code>99999999999</code>). Replacing them with a single fixed value
+like 19 or 56 (the two most common ages) would be an odd choice with no
+real justification, why should someone who typed a negative number
+actually be 19? Instead, anything outside a plausible working-age range
+(15-100) is treated as missing and imputed with the median of the valid
+respondents, a smaller, more defensible intervention (only a handful of
+rows are affected either way).</p>
 </div>
 </div>
 </div>
@@ -8087,7 +8084,7 @@ Name: count, dtype: int64</pre>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>49 distinct spellings for what should be 2-3 categories. Same consolidation the original did (male/female/trans buckets from explicit spelling lists), and the same small number of genuinely ambiguous entries (<code>p</code>, <code>A little about you</code>, <code>Guy (-ish) ^_^</code>) dropped rather than guessed at.</p>
+<p>49 distinct spellings for what should be 2-3 categories, consolidated into male/female/trans buckets from explicit spelling lists. A small number of genuinely ambiguous entries (<code>p</code>, <code>A little about you</code>, <code>Guy (-ish) ^_^</code>) get dropped rather than guessed at.</p>
 </div>
 </div>
 </div>

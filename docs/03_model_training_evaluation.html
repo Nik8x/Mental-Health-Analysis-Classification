@@ -7802,12 +7802,11 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Model-training-and-evaluation">Model training and evaluation<a class="anchor-link" href="#Model-training-and-evaluation">¶</a></h1><p>Random forest, gradient boosting, and XGBoost predicting <code>work_interfere</code>
-(4 ordinal classes), the same 3-model lineup the original notebook used
-across its RF/GBM/XGBoost file, with the <code>num_class</code> bug fixed (4, not
-20) and, unlike the original, an actual majority-class baseline to check
-whether "nearly 50% accurate" (the original's own summary of all 3
-models) is actually good or just close to always guessing "Sometimes".</p>
+<h1 id="Model-training-and-evaluation">Model training and evaluation<a class="anchor-link" href="#Model-training-and-evaluation">¶</a></h1><p>Random forest, gradient boosting, and XGBoost predicting
+<code>work_interfere</code> (4 ordinal classes), with <code>num_class</code> set to match the
+4 actual levels, and an actual majority-class baseline to check whether
+"nearly 50% accurate" is actually good or just close to always guessing
+"Sometimes".</p>
 </div>
 </div>
 </div>
@@ -7922,7 +7921,7 @@ majority-class baseline accuracy: 0.467
 
 <span class="n">xgb_model</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">(</span>
     <span class="n">objective</span> <span class="o">=</span> <span class="s1">'multi:softmax'</span><span class="p">,</span>
-    <span class="n">num_class</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>               <span class="c1"># the original set this to 20 despite only 4 classes existing</span>
+    <span class="n">num_class</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>               <span class="c1"># matches the 4 actual classes present</span>
     <span class="n">max_depth</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">eta</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
     <span class="n">n_estimators</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
@@ -8025,12 +8024,9 @@ majority-class baseline accuracy: 0.467
 accuracy) barely edges past the 46.7% majority-class baseline, XGBoost
 (42.7%) and random forest (36.2%, using balanced class weights, which
 trades accuracy for better minority-class recall) both come in <em>below</em>
-it on raw accuracy. The original's own summary, "all the models are
-nearly 50% accurate," reads very differently once there's a baseline to
-compare against: fixing the real bugs (encoding, the <code>num_class</code>
-mistake) didn't rescue this into a genuinely strong classifier, it
-confirmed the original's number was close to a coin flip's worth of
-information all along. Macro-F1 tells a more nuanced story, random
+it on raw accuracy. "Nearly 50% accurate" reads very differently once
+there's a baseline to compare against, it's close to a coin flip's
+worth of information. Macro-F1 tells a more nuanced story, random
 forest's 0.325 versus the baseline's 0.0 shows it does capture real,
 balanced signal across all 4 classes that raw accuracy hides (the
 baseline gets zero credit on 3 of 4 classes by construction), it's just

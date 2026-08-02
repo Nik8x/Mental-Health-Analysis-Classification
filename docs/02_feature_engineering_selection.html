@@ -7802,16 +7802,14 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Feature-engineering">Feature engineering<a class="anchor-link" href="#Feature-engineering">¶</a></h1><p>Building the feature matrix for the real target, <code>work_interfere</code> (4
-ordinal classes: Never, Rarely, Sometimes, Often), the same target the
-original notebook used. One of this project's original modeling
-notebooks configured XGBoost with <code>num_class = 20</code> despite there being
-only 4 classes present, a real bug (harmless to the math since XGBoost
-just never predicts the 16 phantom classes, but wasteful and a sign
-nobody checked <code>nlevels(work_interfere)</code> before setting it). Country and
-the workplace-culture columns (benefits, care_options, leave, etc.) get
-one-hot encoded, not label-encoded, for the same reason as other repos
-in this portfolio, nominal categories don't have a natural order.</p>
+<h1 id="Feature-engineering">Feature engineering<a class="anchor-link" href="#Feature-engineering">¶</a></h1><p>Building the feature matrix for the target, <code>work_interfere</code> (4
+ordinal classes: Never, Rarely, Sometimes, Often). XGBoost needs
+<code>num_class</code> set explicitly for multi-class objectives, that gets set to
+match the actual 4 levels present rather than a larger, stale count,
+which would be harmless to the math (XGBoost just never predicts the
+extra classes) but wasteful. Country and the workplace-culture columns
+(benefits, care_options, leave, etc.) get one-hot encoded, not
+label-encoded, since nominal categories don't have a natural order.</p>
 </div>
 </div>
 </div>
@@ -7862,7 +7860,7 @@ Name: count, dtype: int64</pre>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'this dataset actually has </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s1"> classes, not the 20 the original XGBoost config allocated for'</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'this dataset actually has </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s1"> classes, num_class needs to match that, not a higher stale count'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7875,7 +7873,7 @@ Name: count, dtype: int64</pre>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>this dataset actually has 4 classes, not the 20 the original XGBoost config allocated for
+<pre>this dataset actually has 4 classes, num_class needs to match that, not a higher stale count
 </pre>
 </div>
 </div>
